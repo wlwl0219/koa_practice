@@ -1,6 +1,23 @@
 const koa = require("koa");
 const Router = require('koa-router');
 
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+    // useFindAndModify: false,
+});
+
+const db = mongoose.connection;
+
+const handleOpen = () => console.log('✅ Connected to DB');
+const handleError = error => console.log(`❌ Error on DB Connection:${error}`);
+
+db.once('open', handleOpen);
+db.on('error', handleError);
+
 const app = new koa();
 const router = new Router();
 const api = require('./api');
@@ -29,7 +46,7 @@ app.use(router.routes()).use(router.allowedMethods());
 // app.use(ctx => {
 //     ctx.body = 'Hello Koa';
 // });
-
-app.listen(4000, () => {
-    console.log('heurm server is listening to port 4000');
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+    console.log(`Koa server is listening to port ${port}`);
 });
